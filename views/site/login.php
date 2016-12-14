@@ -3,7 +3,8 @@
 /* @var $this yii\web\View */
 /* @var $form yii\bootstrap\ActiveForm */
 /* @var $model app\models\LoginForm */
-
+use Yii;
+use yii\web\Session;
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
@@ -12,9 +13,13 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="site-login">
     <h1><?= Html::encode($this->title) ?></h1>
-
     <p>Please fill out the following fields to login:</p>
-
+<?php if (Yii::$app->session->hasFlash('success')): ?>
+<div class="alert alert-success alert-dismissable">
+<button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+<?= Yii::$app->session->getFlash('success') ?>
+</div>
+<?php endif; ?>
     <?php $form = ActiveForm::begin([
         'id' => 'login-form',
         'layout' => 'horizontal',

@@ -89,7 +89,7 @@ throw new yii\base\NotSupportedException;
      */
     public function validateAuthKey($authKey)
     {
-        return $this->token === $authKey;
+        return $token === $authKey;
     }
 
     public static function findByUsername($username){
@@ -100,10 +100,25 @@ throw new yii\base\NotSupportedException;
         return password_verify($password,$this->password);
     }
     
+
+    
     public function generateToken($username){
       return md5($username.microtime().rand()); 
     }
+       public static function isActive($id){
+        return self::findOne(['userID' => $id, 'statusID' => 1]);
+    }
+        public static function findOneByIDToken($id,$token)
+    {
+        return self::findOne(['userID' => $id, 'token' => $token]);
+    }
+    public static function activateUser($id){
+        $user=self::findOne($id);
+        $user->statusID=1;
+        return $user->update();
+    }
     
+
    public function getStatus()
     {
         return $this->hasOne(Userstatus::className(), ['statusID' => 'statusID']);

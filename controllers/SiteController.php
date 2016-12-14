@@ -137,7 +137,7 @@ class SiteController extends Controller
               $email = \Yii::$app->mailer->compose()
                 ->setTo($user->email)
                 ->setFrom('Auto_sender@company.com')
-                ->setSubject('Signup Confirmation')->setTextBody(" Click this link to confirm".Url::toRoute(['http://'.$_SERVER['SERVER_NAME'].'/confirm','id'=>base64_encode($user->id),'token'=>$user->token]))->send();
+                ->setSubject('Signup Confirmation')->setTextBody(" Click this link to confirm".Url::toRoute(['http://'.$_SERVER['SERVER_NAME'].'/users/confirm','id'=>base64_encode($user->id),'token'=>$user->token]))->send();
                 if($email){
                 Yii::$app->getSession()->setFlash('success','Check Your email!');
                 }else{

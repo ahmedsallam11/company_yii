@@ -9,7 +9,7 @@ use app\models\auth\AuthAssignment;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-
+use yii\web\user\Session;
 /**
  * UsersController implements the CRUD actions for Users model.
  */
@@ -125,19 +125,18 @@ class UsersController extends Controller
         }
     }
     
-//       public function actionActivate($token) {
-//      if ($token!='') {
-//    $model=backUser::model()->find('activate=:token',array(':token'=>$token));
-//    if ($model) {
-//        $model->status=backUser::statusID;
-//        if ($model->update(array('status'))) {
-//     echo "done";
-//      }
-//      $this->redirect('/');
-//    } else {
-//         throw new CHttpException(404, "Invalid Activation Code!");
-//    }
-//}
-  //}
-    
+
+           public function actionConfirm() {
+        $token = Yii::$app->getRequest()->getQueryParam('token');
+        $encUserID = Yii::$app->getRequest()->getQueryParam('id');    
+         if(backUser::findOneByIDToken(base64_decode($encUserID),$token)){
+            if(!backUser::isActive(base64_decode($encUserID))){
+             backUser::activateUser(base64_decode($encUserID));
+             Yii::$app->session->setFlash('success', "Congratulation! <br> Your Account is active now");
+            }else{Yii::$app->session->setFlash('success', "Your Account is already active");}
+             return Yii::$app->getResponse()->redirect(array('login'));
+            }else{
+             echo "No DATA";
+         } 
+       }
 }
