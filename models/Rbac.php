@@ -44,7 +44,7 @@ class Rbac extends backUser {
           $userRole=self::getUserRole();
           if(!empty($userRole) && $userRole == 'admin'){
             return true;
-         }else{Yii::$app->getSession()->setFlash('warning','Your not allowed to perform this action!');
+         }else{Yii::$app->getSession()->setFlash('warning','You are not allowed to perform this action!');
                return Controller::redirect('/profile/view');}
          }else{return Controller::redirect('/login');}
     }
@@ -57,7 +57,7 @@ class Rbac extends backUser {
          if(in_array($action,self::AccessRules()[$userRole])){
           return true;     
          }else{
-          Yii::$app->getSession()->setFlash('warning','Your not allowed to perform this action!');
+          Yii::$app->getSession()->setFlash('warning','You are not allowed to perform this action!');
           return Controller::redirect(Yii::$app->request->referrer);        
          } 
          }else {
