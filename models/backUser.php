@@ -3,7 +3,6 @@
 namespace app\models;
 
 use Yii;
-use  app\models\auth\AuthAssignment;
 
 /**
  * This is the model class for table "users".
@@ -18,9 +17,7 @@ use  app\models\auth\AuthAssignment;
  */
 class backUser extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 {
-    /**
-     * @inheritdoc
-     */
+ 
     public static function tableName()
     {
         return 'users';
@@ -33,9 +30,10 @@ class backUser extends \yii\db\ActiveRecord implements \yii\web\IdentityInterfac
     {
         return [
             [['username', 'email', 'password', 'token'], 'required'],
-            [['roleID', 'statusID'], 'integer'],
+            [['role', 'statusID'], 'integer'],
             [['username', 'email', 'password'], 'string', 'max' => 250],
             [['token'], 'string', 'max' => 255],
+            ['roleID', 'default', 'value' => 3],
         ];
     }
 
@@ -84,14 +82,10 @@ throw new yii\base\NotSupportedException;
         return $this->token;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function validateAuthKey($authKey)
     {
         return $token === $authKey;
     }
-
     public static function findByUsername($username){
         return self::findOne(['username'=>$username]);
     }
@@ -100,7 +94,6 @@ throw new yii\base\NotSupportedException;
         return password_verify($password,$this->password);
     }
     
-
     
     public function generateToken($username){
       return md5($username.microtime().rand()); 
@@ -113,19 +106,22 @@ throw new yii\base\NotSupportedException;
         return self::findOne(['userID' => $id, 'token' => $token]);
     }
     public static function activateUser($id){
-        $user=self::findOne($id);
+        $user=self::findOne(['userID' => $id]);
         $user->statusID=1;
-        return $user->update();
+        return $user->update(false);
     }
     
-
    public function getStatus()
     {
         return $this->hasOne(Userstatus::className(), ['statusID' => 'statusID']);
     }   
        public function getRole()
     {
-        return $this->hasOne(AuthAssignment::className(), ['user_id' => 'userID']);
+        return $this->hasOne(Roles::className(), ['roleID' => 'roleID']);
     } 
     
-}
+
+    
+    
+    }
+

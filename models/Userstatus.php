@@ -42,9 +42,4 @@ class Userstatus extends \yii\db\ActiveRecord
             'status' => Yii::t('app', 'Status'),
         ];
     }
-   public function getbackUser()
-    {
-        return $this->hasMany(backUser::className(), ['statusID' => 'statusID']);
-    }    
-    
 }

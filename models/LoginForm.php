@@ -65,11 +65,13 @@ class LoginForm extends Model
         return false;
     }
 
-    /**
-     * Finds user by [[username]]
-     *
-     * @return User|null
-     */
+//   public function loginAdmin(){
+//     if ($this->validate() && backUser::isUserAdmin($this->username)) {
+//     return Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600 * 24 * 30 : 0);
+//    } else {
+//     return false;
+//  }
+//}
     public function getUser()
     {
         if ($this->_user === false) {

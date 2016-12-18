@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -9,36 +10,63 @@ use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
 use app\models\SignupForm;
+use app\models\Rbac;
 use yii\web\Session;
 use yii\helpers\Html;
 use yii\helpers\Url;
+use app\models\backUser;
 
 class SiteController extends Controller
 {
     /**
      * @inheritdoc
      */
-    public function behaviors()
-    {
-        return [
-            'access' => [
-                'class' => AccessControl::className(),
-                'only' => ['logout'],
-                'rules' => [
-                    [
-                        'actions' => ['logout'],
-                        'allow' => true,
-                        'roles' => ['@'],
-                    ],
-                ],
-            ],
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'logout' => ['post'],
-                ],
-            ],
-        ];
+    
+//    public function beforeAction($action)
+//{
+//    //if (parent::beforeAction($action)) {
+//       return Rbac::userCan($this->action->id);
+//       //$this->action->id == 'lang' 
+//        
+//        
+//}
+    public function behaviors(){
+
+return [
+       'access' => [
+           'class' => AccessControl::className(),
+           'only' => ['logout', 'signup', 'about'],
+           'rules' => [
+               [
+                   'actions' => ['signup'],
+                   'allow' => true,
+                   'roles' => ['?'],
+               ],
+    
+               [
+                   'actions' => ['logout'],
+                   'allow' => true,
+                   'roles' => ['@'],
+               ],
+               [
+                   'actions' => ['about'],
+                   'allow' => true,
+                   'roles' => ['@'],
+                   'matchCallback' => function ($rule, $action) {
+                       return User::isUserAdmin(Yii::$app->user->identity->username);
+                   }
+               ],
+           ],
+       ],
+       'verbs' => [
+           'class' => VerbFilter::className(),
+           'actions' => [
+           'logout' => ['post'],
+           ],
+       ],
+   ];
+
+        
     }
 
     /**
@@ -75,17 +103,18 @@ class SiteController extends Controller
      */
     public function actionLogin()
     {
-        if (!Yii::$app->user->isGuest) {
-            return $this->goHome();
-        }
-
-        $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->goBack();
-        }
-        return $this->render('login', [
-            'model' => $model,
-        ]);
+   if (!\Yii::$app->user->isGuest) {
+      return $this->goHome();
+   }
+ 
+   $model = new LoginForm();
+   if ($model->load(Yii::$app->request->post()) && $model->login()) {
+      return $this->redirect('/profile/view');
+   } else {
+       return $this->render('login', [
+          'model' => $model,
+       ]);
+   }
     }
 
     /**
@@ -128,7 +157,7 @@ class SiteController extends Controller
         return $this->render('about');
     }
     
-    public function actionSignup()
+ public function actionSignup()
     {
         $model = new SignupForm ();
         //$user = new Users();
@@ -137,16 +166,13 @@ class SiteController extends Controller
               $email = \Yii::$app->mailer->compose()
                 ->setTo($user->email)
                 ->setFrom('Auto_sender@company.com')
-                ->setSubject('Signup Confirmation')->setTextBody(" Click this link to confirm".Url::toRoute(['http://'.$_SERVER['SERVER_NAME'].'/users/confirm','id'=>base64_encode($user->id),'token'=>$user->token]))->send();
+                ->setSubject('Signup Confirmation')->setTextBody(" Click this link to confirm".Url::toRoute(['http://'.$_SERVER['SERVER_NAME'].'/confirm','id'=>base64_encode($user->id),'token'=>$user->token]))->send();
                 if($email){
                 Yii::$app->getSession()->setFlash('success','Check Your email!');
                 }else{
                 Yii::$app->getSession()->setFlash('warning','Failed, contact Admin!');
                 }  
-
-
-                return $this->goHome();
-
+                return $this->redirect(['login']);
                 }
                 }
                 return $this->render('signup', [
@@ -154,4 +180,18 @@ class SiteController extends Controller
                 ]);
                 }
     
+        public function actionConfirm() {
+        $token = Yii::$app->getRequest()->getQueryParam('token');
+        $encUserID = Yii::$app->getRequest()->getQueryParam('id');    
+         if(backUser::findOneByIDToken(base64_decode($encUserID),$token)){
+            if(!backUser::isActive(base64_decode($encUserID))){    
+             if(backUser::activateUser(base64_decode($encUserID))){
+             Yii::$app->session->setFlash('success', "Congratulation! <br> Your Account is active now");}
+             else{Yii::$app->session->setFlash('warning', "Error!");}   
+            }else{Yii::$app->session->setFlash('success', "Your Account is already active");}
+             return Yii::$app->getResponse()->redirect(array('login'));
+            }else{
+             echo "No DATA";
+         } 
+       }
 }

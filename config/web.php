@@ -3,6 +3,11 @@
 $params = require(__DIR__ . '/params.php');
 
 $config = [
+       'modules' => [
+        'company' => [
+            'class' => 'app\modules\company\Company',
+        ],
+    ],
     'id' => 'basic',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
@@ -38,13 +43,19 @@ $config = [
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
-            'rules' => ['<alias:\w+>' => 'site/<alias>',
+            'rules' => [
+            'users/<action>' => 'users/<action>',
+            'profile/<action>' => 'profile/<action>',
+            '<alias:\w+>' => 'site/<alias>',
+            '<controller>/<action>' => 'company/<controller>/<action>',
+
+
             ],
         ],
-     'authManager' => [
-                           'class' => 'yii\rbac\DbManager',
-                           'defaultRoles' => ['guest','admin'],
-          ],
+       'authManager'=>[
+    'class'=>'yii\rbac\DbManager',
+    'defaultRoles' => ['guest'],
+], 
     ],
     'params' => $params,
 ];

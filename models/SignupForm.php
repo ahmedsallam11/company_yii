@@ -1,7 +1,5 @@
 <?php
-
 namespace app\models;
-
 use Yii;
 use yii\base\Model;
 use app\models\backUser;
@@ -29,7 +27,6 @@ class SignupForm extends Model {
             ['password_again','compare','compareAttribute'=>'password'],
         ];
     }
-
     public function signup()
     {
         if (!$this->validate()) {

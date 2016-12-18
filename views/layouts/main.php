@@ -8,6 +8,7 @@ use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
+use app\models\Rbac;
 
 AppAsset::register($this);
 ?>
@@ -40,6 +41,7 @@ AppAsset::register($this);
             ['label' => 'Employees', 'url' => ['/employees/index']],
             ['label' => 'Supervisors', 'url' => ['/supervisors/index']],
             ['label' => 'Departments', 'url' => ['/departments/index']],
+             
             ['label' => 'Users', 'url' => ['/users/index']],
 
             Yii::$app->user->isGuest ? (
@@ -63,8 +65,6 @@ AppAsset::register($this);
         <?= Breadcrumbs::widget([
             'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
         ]) ?>
-        
-        
         <?= $content ?>
     </div>
 </div>
